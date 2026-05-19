@@ -24,7 +24,7 @@
 
     </div>
 
-  
+          
     <div class="status">
       <p>Current Turn: White</p>
       <p>Game Status: Active</p>
