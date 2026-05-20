@@ -1,11 +1,7 @@
 <template>
   <div class="chess-container">
     <div class="board">
-      <div
-        v-for="(row, r) in 8"
-        :key="r"
-        class="row"
-      >
+      <div v-for="(row, r) in 8" :key="r" class="row">
         <div
           v-for="(col, c) in 8"
           :key="c"
@@ -26,27 +22,19 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "App",
+<script setup>
+const board = [
+  ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"],
+  ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
+  ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
+]
 
-  methods: {
-    getPiece(r, c) {
-      const board = [
-        ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"],
-        ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
-        ["", "", "", "", "", "", "", ""],
-        ["", "", "", "", "", "", "", ""],
-        ["", "", "", "", "", "", "", ""],
-        ["", "", "", "", "", "", "", ""],
-        ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
-        ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
-      ];
-
-      return board[r][c];
-    },
-  },
-};
+const getPiece = (r, c) => board[r][c]
 </script>
 
 <style scoped>
@@ -70,7 +58,6 @@ export default {
 .square {
   width: 70px;
   height: 70px;
-
   display: flex;
   justify-content: center;
   align-items: center;
