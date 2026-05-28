@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ChessView from '@/views/ChessView.vue'
+import ChessView from '@/views/chessview.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,4 +13,3 @@ const router = createRouter({
 })
 
 export default router
-
