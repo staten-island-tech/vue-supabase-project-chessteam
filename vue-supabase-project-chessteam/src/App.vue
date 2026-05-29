@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="chess-container">
     <div class="board">
       <div v-for="(row, r) in 8" :key="r" class="row">
@@ -81,4 +81,18 @@ const getPiece = (r, c) => board[r][c]
   text-align: center;
   font-size: 18px;
 }
+</style> -->
+<template>
+  <div>
+<h2>TEST</h2>
+<RouterView/>
+  </div>
+</template>
+
+<script setup>
+
+</script>
+
+<style lang="scss" scoped>
+
 </style>
