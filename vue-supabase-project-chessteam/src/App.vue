@@ -84,7 +84,7 @@ const getPiece = (r, c) => board[r][c]
 </style> -->
 <template>
   <div>
-<h2>TEST</h2>
+<h2>WELCOME</h2>
 <RouterView/>
   </div>
 </template>
