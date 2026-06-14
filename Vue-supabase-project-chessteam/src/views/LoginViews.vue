@@ -32,7 +32,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '../'
+import { supabase } from '../utils/supabase'
+
+
 
 const username = ref('')
 const email = ref('')
