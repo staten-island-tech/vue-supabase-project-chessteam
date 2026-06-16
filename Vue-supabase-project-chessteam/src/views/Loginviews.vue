@@ -35,7 +35,7 @@
     if (error) {
       message.value = error.message
     } else {
-      authStore.setUser(data.user)    // Pinia store gets the user
+      authStore.setUser(data.user)   
       router.push('/game')
     }
   }
