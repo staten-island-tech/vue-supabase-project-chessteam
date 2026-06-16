@@ -65,6 +65,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { gsap } from 'gsap'
+import { supabase } from '@/utils/supabase'
+import { useAuthStore } from '@/stores/auth'
+
 
 
 const initialBoard = () => [
@@ -303,7 +306,7 @@ function attemptMove(sr, sc, tr, tc) {
   })
 }
 
-function finishMove(sr, sc, tr, tc, piece, target) {
+async function finishMove(sr, sc, tr, tc, piece, target) {
   if (target) {
     if (isBlack(target)) capturedByWhite.value.push(target)
     else capturedByBlack.value.push(target)
@@ -323,6 +326,18 @@ function finishMove(sr, sc, tr, tc, piece, target) {
 
   if (isCheckmate.value) {
     winner.value = turn.value === 'white' ? 'black' : 'white'
+
+    const authStore = useAuthStore()
+    if (authStore.user) {
+      const { error } = await supabase.from('games').insert({
+        games: Date.now(),              
+        white_player_id: authStore.user.id,
+        black_player_id: authStore.user.id,
+        winner_id: authStore.user.id,  
+        status: 'finished'
+      })
+      if (error) console.error('Failed to save game:', error.message)
+    }
   }
 }
 
@@ -336,6 +351,16 @@ function resetGame() {
   capturedByWhite.value = []
   capturedByBlack.value = []
 }
+
+const { error } = await supabase.from('games').insert({
+  games: Date.now(),
+  white_player_id: authStore.user.id,
+  black_player_id: authStore.user.id,
+  winner_id: authStore.user.id,
+  status: 'finished'
+})
+if (error) console.error('Failed to save game:', error.message)
+
 </script>
 
 <style scoped>
