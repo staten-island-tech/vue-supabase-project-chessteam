@@ -4,12 +4,26 @@
     <p>Total games played: {{ totalGames }}</p>
 
     <div v-for="game in games" :key="game.games">
-  <strong>Status:</strong> {{ game.status }} |
-  <strong>Player:</strong> {{ game.profiles?.username || 'Unknown' }} |
-  <strong>Date:</strong> {{ new Date(game.created_at).toLocaleDateString() }}
-  <button @click="updateGame(game.games)">Mark Reviewed</button>
-  <button @click="deleteGame(game.games)">Delete</button>
-</div>
+      <strong>Status:</strong> {{ game.status }} |
+      <strong>Winner ID:</strong> {{ game.winner_id }} |
+      <strong>Date:</strong> {{ new Date(game.created_at).toLocaleDateString() }}
+      <button @click="updateGame(game.games)">Mark Reviewed</button>
+      <button @click="deleteGame(game.games)">Delete</button>
+    </div>
+
+    <hr />
+
+    <h2>Supabase Aggregation</h2>
+    <div class="result-box">
+      <button @click="runAggregation">Log Sample Aggregation</button>
+      <pre>{{ aggregationResult }}</pre>
+    </div>
+
+    <h2>Supabase Join</h2>
+    <div class="result-box">
+      <button @click="runJoin">Log Sample Join</button>
+      <pre>{{ joinResult }}</pre>
+    </div>
   </div>
 </template>
 
@@ -18,17 +32,13 @@ import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/utils/supabase'
 
 const games = ref([])
+const aggregationResult = ref('')
+const joinResult = ref('')
+
 onMounted(async () => {
   const { data, error } = await supabase
     .from('games')
-    .select(`
-      games,
-      status,
-      created_at,
-      winner_id,
-      white_player_id,
-      profiles!games_white_player_id_fkey(username, rating)
-    `)
+    .select('games, status, created_at, winner_id, white_player_id')
 
   if (error) console.error('Failed to fetch games:', error.message)
   else games.value = data || []
@@ -36,67 +46,43 @@ onMounted(async () => {
 
 const totalGames = computed(() => games.value.length)
 
-async function updateGame(gameId) {
-  const { error } = await supabase
+async function runAggregation() {
+  const { data, error } = await supabase
     .from('games')
-    .update({ status: 'reviewed' })
-    .eq('games', gameId)
-  if (error) console.error(error.message)
-  else {
-    const game = games.value.find(g => g.games === gameId)
-    if (game) game.status = 'reviewed'
+    .select('status, games')
+
+  if (error) {
+    aggregationResult.value = error.message
+  } else {
+    const counts = {}
+    data.forEach(g => {
+      counts[g.status] = (counts[g.status] || 0) + 1
+    })
+    aggregationResult.value = JSON.stringify(
+      Object.entries(counts).map(([status, total]) => ({ status, total })),
+      null, 2
+    )
   }
 }
 
-async function deleteGame(gameId) {
-  const { error } = await supabase
+async function runJoin() {
+  const { data, error } = await supabase
     .from('games')
-    .delete()
-    .eq('games', gameId)
-  if (error) console.error(error.message)
-  else games.value = games.value.filter(g => g.games !== gameId)
-}
-</script>
+    .select(`
+      games,
+      status,
+      created_at,
+      profiles!games_white_player_id_fkey(username, rating)
+    `)
 
-<style scoped>
-.past-games {
-  padding: 24px;
-  font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-h2 {
-  font-size: 24px;
-  margin-bottom: 8px;
+  if (error) {
+    joinResult.value = error.message
+  } else {
+    joinResult.value = JSON.stringify(data, null, 2)
+  }
 }
 
-div div {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+async function updateGame(gameId) {
+  const { error } = await supabase
 }
-
-button {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-button:first-of-type {
-  background: #4a3728;
-  color: white;
-}
-
-button:last-of-type {
-  background: #cc3333;
-  color: white;
-}
-</style>
+</script> 
