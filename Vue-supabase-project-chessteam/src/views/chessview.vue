@@ -333,20 +333,21 @@ function finishMove(sr, sc, tr, tc, piece, target) {
 }
 
 async function saveGame(winnerColor) {
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) {
-    console.warn('No session, skipping save')
+  console.log('saveGame called, user:', authStore.user)
+  if (!authStore.user) {
+    console.warn('No user logged in, skipping save')
     return
   }
   const { error } = await supabase.from('games').insert({
     games: Date.now(),
-    white_player_id: session.user.id,
-    black_player_id: session.user.id,
-    winner_id: session.user.id,
+    white_player_id: authStore.user.id,
+    black_player_id: authStore.user.id,
+    winner_id: authStore.user.id,
     status: 'finished'
   })
   if (error) console.error('Failed to save game:', error.message)
 }
+
 function resetGame() {
   board.value         = initialBoard()
   selected.value      = null
